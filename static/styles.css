@@ -1,0 +1,201 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+/* Basic styling */
+body {
+    font-family: 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    transition: background-color 0.3s ease;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+header h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 2.5em;
+    font-weight: 300;
+    color: #007BFF;
+    font-family: "Ubuntu", sans-serif;
+    font-weight: 400;
+}
+
+section {
+    margin-bottom: 20px;
+    padding: 20px;
+    background-color: rgba(255, 255, 255, 0.4);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    font-family: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
+}
+
+.upload-section form,
+.ingredients-section form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+input[type="file"],
+input[type="text"],
+input[type="number"],
+button {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+    font-weight: 300;
+    transition: all 0.3s ease;
+    font-family: 'Lato', 'Helvetica Neue', Arial, sans-serif;
+}
+
+input[type="file"]:focus,
+input[type="text"]:focus,
+input[type="number"]:focus {
+    border-color: #007BFF;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+button {
+    background-color: #007BFF;
+    color: #fff;
+    cursor: pointer;
+    border: none;
+}
+
+button:hover {
+    background-color: #0056b3;
+    transition: background-color 0.3s ease;
+}
+
+.nutritional-info-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.8em;
+    font-family: 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+}
+
+.nutritional-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    width: 100%;
+}
+
+.ingredient-info {
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    font-size: 0.9em;
+    font-family: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
+}
+
+.ingredient-info h3 {
+    margin-top: 0;
+    font-size: 1.6sem;
+    color: #007BFF;
+    font-family: "Work Sans", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.nutritional-info-section canvas {
+    max-width: 80%;
+    margin-bottom: 20px;
+}
+
+.small-chart {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    margin: 0 auto;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+ul li {
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.6);
+    border-radius: 5px;
+    border: 1px solid #e0e0e0;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+ul li:hover {
+    background-color: #f1f1f1;
+    transform: translateY(-2px);
+}
+
+ul li:before {
+    content: '•';
+    color: #007BFF;
+    font-size: 1.5em;
+    margin-right: 10px;
+}
+
+.messages-section ul {
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    transition: background-color 0.3s ease;
+}
+
+.messages-section li {
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 5px;
+    border: 1px solid #e0e0e0;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
+    form {
+        flex-direction: column;
+    }
+
+    .nutritional-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .nutritional-info-section canvas,
+    .small-chart {
+        max-width: 100%;
+    }
+}
+
+#glCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}

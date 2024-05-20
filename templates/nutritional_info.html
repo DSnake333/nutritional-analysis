@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nutritional Information</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 50%;
+        }
+
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Nutritional Information</h1>
+
+    {% for ingredient_info in ingredients_info %}
+    <h2>{{ ingredient_info['text'] }}</h2>
+    {% for parsed_info in ingredient_info['parsed'] %}
+    <table>
+        <tr>
+            <th>Nutrient</th>
+            <th>Quantity</th>
+            <th>Unit</th>
+        </tr>
+        {% for nutrient, value in parsed_info['nutrients'].items() %}
+        <tr>
+            <td>{{ value['label'] }}</td>
+            <td>{{ value['quantity'] }}</td>
+            <td>{{ value['unit'] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endfor %}
+    {% endfor %}
+</body>
+</html>

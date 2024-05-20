@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nutritional Information App</title>
+    <link rel="stylesheet" href="static/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <canvas id="glCanvas"></canvas>
+    <div class="container">
+        <header>
+            <h1>Nutritional Information App</h1>
+        </header>
+
+        <section class="upload-section">
+            <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
+                <input type="file" name="image" accept="image/*" required>
+                <button type="submit">Upload</button>
+            </form>
+        </section>
+
+        {% if processed_image %}
+        <section class="processed-section">
+            <h2>Processed Image</h2>
+            <img src="{{ url_for('static', filename='uploads/' + processed_image) }}" alt="Processed Image">
+        </section>
+        {% endif %}
+
+        {% if ingredients %}
+        <section class="ingredients-section">
+            <h2>Ingredients List</h2>
+            <form action="{{ url_for('update_ingredients') }}" method="post">
+                <ul>
+                    {% for ingredient in ingredients %}
+                    <li>
+                        <input type="text" name="ingredients[]" value="{{ ingredient.name }}">
+                        <input type="number" name="quantities[]" value="{{ ingredient.quantity }}">
+                    </li>
+                    {% endfor %}
+                </ul>
+                <button type="submit">Update Ingredients</button>
+            </form>
+        </section>
+        {% endif %}
+
+        {% if edited_ingredients %}
+        <section class="edited-ingredients-section">
+            <h2>Edited Ingredients</h2>
+            <ul>
+                {% for ingredient, quantity in edited_ingredients.items() %}
+                <li>{{ ingredient }}: {{ quantity }}</li>
+                {% endfor %}
+            </ul>
+        </section>
+        {% endif %}
+
+        {% if nutritional_info %}
+        <section class="nutritional-info-section">
+            <h2>Nutritional Information</h2>
+            <canvas id="nutritionChart"></canvas>
+            <div class="nutritional-info-grid">
+                {% for name, _ in edited_ingredients.items() %}
+                {% set ingredient_info = nutritional_info[loop.index0] %}
+                <div class="ingredient-info">
+                    <h3>{{ name }}</h3>
+                    <ul>
+                        <li>Calories: {{ ingredient_info.get('calories', 'N/A') }}</li>
+                        <li>Total CO2 Emissions: {{ ingredient_info.get('totalCO2Emissions', 'N/A') }}</li>
+                        <li>CO2 Emissions Class: {{ ingredient_info.get('co2EmissionsClass', 'N/A') }}</li>
+                        <li>Total Weight: {{ ingredient_info.get('totalWeight', 'N/A') }}</li>
+                        <li>Diet Labels: {{ ingredient_info.get('dietLabels', 'N/A') }}</li>
+                        <li>Caution Labels: {{ ingredient_info.get('cautions', 'N/A') }}</li>
+                        <li>Total Nutrients:
+                            <ul>
+                                <li>Total Fat: {{ ingredient_info.get('totalNutrients', {}).get('FAT', {}).get('quantity', 'N/A') }} {{ ingredient_info.get('totalNutrients', {}).get('FAT', {}).get('unit', '') }}</li>
+                                <li>Fatty Acids, Saturated: {{ ingredient_info.get('totalNutrients', {}).get('FASAT', {}).get('quantity', 'N/A') }} {{ ingredient_info.get('totalNutrients', {}).get('FASAT', {}).get('unit', '') }}</li>
+                                <li>Fatty Acids, Trans: {{ ingredient_info.get('totalNutrients', {}).get('FATRN', {}).get('quantity', 'N/A') }} {{ ingredient_info.get('totalNutrients', {}).get('FATRN', {}).get('unit', '') }}</li>
+                                <li>Cholesterol: {{ ingredient_info.get('totalNutrients', {}).get('CHOLE', {}).get('quantity', 'N/A') }} {{ ingredient_info.get('totalNutrients', {}).get('CHOLE', {}).get('unit', '') }}</li>
+                                <li>Protein: {{ ingredient_info.get('totalNutrients', {}).get('PROCNT', {}).get('quantity', 'N/A') }} {{ ingredient_info.get('totalNutrients', {}).get('PROCNT', {}).get('unit', '') }}</li>
+                                <li>Carbohydrate, by Difference: {{ ingredient_info.get('totalNutrients', {}).get('CHOCDF', {}).get('quantity', 'N/A') }} {{ ingredient_info.get('totalNutrients', {}).get('CHOCDF', {}).get('unit', '') }}</li>
+                                <li>Fiber, Total Dietary: {{ ingredient_info.get('totalNutrients', {}).get('FIBTG', {}).get('quantity', 'N/A') }} {{ ingredient_info.get('totalNutrients', {}).get('FIBTG', {}).get('unit', '') }}</li>
+                                <li>Sugars: {{ ingredient_info.get('totalNutrients', {}).get('SUGAR', {}).get('quantity', 'N/A') }} {{ ingredient_info.get('totalNutrients', {}).get('SUGAR', {}).get('unit', '') }}</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="analysis-section">
+            <h2>Comprehensive Analysis</h2>
+            <canvas id="analysisChart" class="small-chart"></canvas>
+            <ul>
+                <li>Total Calories: {{ analysis_result.total_calories }}</li>
+                <li>Total Protein: {{ analysis_result.total_protein }}</li>
+                <li>Total Fat: {{ analysis_result.total_fat }}</li>
+                <li>Total Carbohydrates: {{ analysis_result.total_carbohydrates }}</li>
+                <li>Total Fiber: {{ analysis_result.total_fiber }}</li>
+            </ul>
+        </section>
+
+        <section class="healthiness-section">
+            <h2>Healthiness Assessment</h2>
+            <p>The product is {{ healthiness_assessment }}</p>
+            <h3>Reasons for Assessment</h3>
+            <ul>
+                {% for reason in reasons %}
+                <li>{{ reason }}</li>
+                {% endfor %}
+            </ul>
+            <h3>Unhealthy Ingredients Found</h3>
+            <ul>
+                {% for ingredient in unhealthy_ingredients %}
+                <li>{{ ingredient }}</li>
+                {% endfor %}
+            </ul>
+            <h3>Recommended Alternatives</h3>
+            <ul>
+                {% for recommendation in recommendations %}
+                <li>{{ recommendation }}</li>
+                {% endfor %}
+            </ul>
+        </section>
+        {% endif %}
+
+        {% if messages %}
+        <section class="messages-section">
+            <h2>Messages</h2>
+            <ul>
+                {% for message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        </section>
+        {% endif %}
+    </div>
+
+    <script>
+        {% if nutritional_info %}
+        var nutritionData = {
+            labels: [{% for name, _ in edited_ingredients.items() %}"{{ name }}",{% endfor %}],
+            datasets: [{
+                label: 'Calories',
+                data: [{% for name, _ in edited_ingredients.items() %}{{ nutritional_info[loop.index0].calories }},{% endfor %}],
+                backgroundColor: 'rgba(54, 162, 235, 0.8)', // Blue color with transparency
+                borderColor: 'rgba(54, 162, 235, 1)', // Solid blue color
+                borderWidth: 1
+            }]
+        };
+
+        var ctxNutrition = document.getElementById('nutritionChart').getContext('2d');
+        var nutritionChart = new Chart(ctxNutrition, {
+            type: 'bar',
+            data: nutritionData,
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            font: {
+                                size: 14, // Adjust the y-axis font size
+                                weight: 'bold' // Make the y-axis font bold
+                            }
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            font: {
+                                size: 14, // Adjust the x-axis font size
+                                weight: 'bold' // Make the x-axis font bold
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.7)', // Dark background with transparency
+                        titleFont: {
+                            size: 16, // Adjust the tooltip title font size
+                            weight: 'bold' // Make the tooltip title font bold
+                        },
+                        bodyFont: {
+                            size: 14, // Adjust the tooltip body font size
+                            weight: 'bold' // Make the tooltip body font bold
+                        },
+                        padding: 10 // Add padding to the tooltip
+                    },
+                    legend: {
+                        labels: {
+                            font: {
+                                size: 16, // Adjust the legend font size
+                                weight: 'bold' // Make the legend font bold
+                            }
+                        }
+                    }
+                },
+                layout: {
+                    padding: 20 // Add padding around the chart
+                },
+                animation: {
+                    duration: 2000,
+                    easing: 'easeInOutQuart'
+                }
+            }
+        });
+        {% endif %}
+
+        {% if analysis_result %}
+        var analysisData = {
+            labels: ['Total Calories', 'Total Protein', 'Total Fat', 'Total Carbohydrates', 'Total Fiber'],
+            datasets: [{
+                label: 'Comprehensive Analysis',
+                data: [
+                    {{ analysis_result.total_calories }},
+                    {{ analysis_result.total_protein }},
+                    {{ analysis_result.total_fat }},
+                    {{ analysis_result.total_carbohydrates }},
+                    {{ analysis_result.total_fiber }}
+                ],
+                backgroundColor: [
+                    'rgba(10, 14, 112, 0.6)', // Red color with transparency
+                    'rgba(255, 0, 0, 0.6)', // Orange color with transparency
+                    'rgba(255, 205, 86, 0.6)', // Yellow color with transparency
+                    'rgba(75, 192, 192, 0.6)', // Green color with transparency
+                    'rgba(153, 102, 255, 0.6)' // Purple color with transparency
+                ],
+                borderColor: [
+                    'rgba(10, 14, 112, 1)',
+                    'rgba(255, 0, 0, 1)',
+                    'rgba(255, 205, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)'
+                ],
+                borderWidth: 1
+            }]
+        };
+
+        var ctxAnalysis = document.getElementById('analysisChart').getContext('2d');
+        var analysisChart = new Chart(ctxAnalysis, {
+            type: 'pie',
+            data: analysisData,
+            options: {
+                animation: {
+                    duration: 2000,
+                    easing: 'easeInOutQuart'
+                }
+            }
+        });
+        {% endif %}
+    </script>
+
+    <script>
+        var canvas = document.getElementById('glCanvas');
+        var gl = canvas.getContext('webgl');
+
+        var vsSource = `
+            attribute vec4 aVertexPosition;
+            void main(void) {
+                gl_Position = aVertexPosition;
+            }
+        `;
+
+        var fsSource = `
+            precision mediump float;
+            uniform float uTime;
+            uniform vec2 resolution;
+            void main() {
+                vec2 uv = gl_FragCoord.xy / resolution.xy;
+                float greenValue = 0.5 + 0.5 * sin(uTime + uv.x + uv.y);
+                vec3 color = vec3(0.0, greenValue, 0.0);
+                gl_FragColor = vec4(color, 1.0);
+            }
+        `;
+
+        function loadShader(gl, type, source) {
+            var shader = gl.createShader(type);
+            gl.shaderSource(shader, source);
+            gl.compileShader(shader);
+            if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                alert('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader));
+                gl.deleteShader(shader);
+                return null;
+            }
+            return shader;
+        }
+
+        var vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
+        var fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
+
+        var shaderProgram = gl.createProgram();
+        gl.attachShader(shaderProgram, vertexShader);
+        gl.attachShader(shaderProgram, fragmentShader);
+        gl.linkProgram(shaderProgram);
+
+        if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+            alert('Unable to initialize the shader program: ' + gl.getProgramInfoLog(shaderProgram));
+        }
+
+        var vertices = [
+            -1.0, -1.0,
+             1.0, -1.0,
+            -1.0,  1.0,
+             1.0,  1.0,
+        ];
+
+        var vertexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+
+        var positionAttributeLocation = gl.getAttribLocation(shaderProgram, 'aVertexPosition');
+        gl.enableVertexAttribArray(positionAttributeLocation);
+        gl.vertexAttribPointer(positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
+
+        var timeUniformLocation = gl.getUniformLocation(shaderProgram, 'uTime');
+        var resolutionUniformLocation = gl.getUniformLocation(shaderProgram, 'resolution');
+
+        var startTime = Date.now();
+        function animate() {
+            var currentTime = Date.now();
+            var deltaTime = currentTime - startTime;
+            var time = deltaTime / 5000; // Slowing down the transition speed
+
+            gl.uniform1f(timeUniformLocation, time);
+            gl.uniform2f(resolutionUniformLocation, canvas.width, canvas.height);
+
+            gl.clearColor(0.0, 0.0, 0.0, 1.0);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            gl.useProgram(shaderProgram);
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+
+</body>
+</html>
