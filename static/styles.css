@@ -199,3 +199,48 @@ ul li:before {
     height: 100%;
     z-index: -1;
 }
+/* CSS for the upload form */
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+input[type="file"] {
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+button[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition-duration: 0.4s;
+}
+
+button[type="submit"]:hover {
+    background-color: #45a049;
+}
+img {
+    width: 600px; /* Set the desired width */
+    height: 400px; /* Set the desired height */
+    margin: 50px auto; /* Set top and bottom margin to 20px and left and right margin to auto */
+    display: block; /* Ensures that the margin auto works */
+    z-index: 999;
+}
+p {
+    background-color: rgba(45, 227, 25, 0.5); /* Subtle background color */
+    padding: 10px; /* Padding around the text */
+    border-radius: 5px; /* Rounded corners */
+}
